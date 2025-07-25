@@ -1,0 +1,2 @@
+Hello! Thank you for purchasing this product.
+To change materials for shader Urp or Hdrp use folder ExtractMe.
