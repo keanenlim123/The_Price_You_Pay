@@ -6,6 +6,7 @@ public class PlayerBehaviour : MonoBehaviour
 {
     bool canInteract = false;
     DoorBehaviour currentDoor = null;
+    public Transform teleport;
 
     [SerializeField]
     float interactRange = 2f;
@@ -29,6 +30,31 @@ public class PlayerBehaviour : MonoBehaviour
             }
             Debug.DrawRay(rayOrigin, transform.forward * interactRange, Color.green);
         }
+    }
+
+    public void Respawn()  
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        if (teleport != null)
+        {
+            transform.position = teleport.position;
+            Debug.Log("Teleporting to: " + teleport.position);
+
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.Sleep(); 
+            }
+
+            Physics.SyncTransforms();
+        }
+        else
+        {
+            Debug.LogWarning("Spawn location not assigned!");
+        }
+
     }
     void OnInteract()
     {
