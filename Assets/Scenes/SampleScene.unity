@@ -586,7 +586,10 @@ MonoBehaviour:
   catchDistance: 5
   walkSpeed: 2
   sprintSpeed: 5
+  waitTimer: 0
   waitDuration: 2
+  minIdleTime: 1
+  maxIdleTime: 4
   camera1: {fileID: 1000611991}
   lighting: {fileID: 1994923708}
 --- !u!95 &359343045
