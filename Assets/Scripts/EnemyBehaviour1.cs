@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
-public class EnemyBehaviour : MonoBehaviour
+public class EnemyBehaviour1 : MonoBehaviour
 {
     public enum EnemyState { Idle, Patrol, Chase, Jumpscare }
     public EnemyState currentState;
@@ -15,9 +15,7 @@ public class EnemyBehaviour : MonoBehaviour
     public GameObject playermodel;
     public float chaseRange = 10f;
     public float catchDistance = 2f;
-
-    public float walkSpeed = 2f;
-    public float sprintSpeed = 5f;
+    public float sprintSpeed = 10f;
 
     public float waitTimer;
 
@@ -40,7 +38,7 @@ public class EnemyBehaviour : MonoBehaviour
         randNum = Random.Range(0, patrolPoints.Length);
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        agent.speed = walkSpeed;
+        agent.speed = sprintSpeed;
 
         if (agent == null)
         {
@@ -50,7 +48,7 @@ public class EnemyBehaviour : MonoBehaviour
 
         currentState = EnemyState.Patrol;
         patrolIndex = randNum;
-        animator.SetTrigger("walk");
+        animator.SetTrigger("sprint");
     }
 
     void Update()
@@ -60,7 +58,6 @@ public class EnemyBehaviour : MonoBehaviour
         switch (currentState)
         {
             case EnemyState.Idle:
-                animator.ResetTrigger("walk");
                 animator.ResetTrigger("sprint");
                 animator.ResetTrigger("jumpscare");
                 animator.SetTrigger("idle");
@@ -76,13 +73,12 @@ public class EnemyBehaviour : MonoBehaviour
                 break;
 
             case EnemyState.Patrol:
-                agent.speed = walkSpeed;
+                agent.speed = sprintSpeed;
 
-                if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+                if (!animator.GetCurrentAnimatorStateInfo(0).IsName("sprint"))
                 {
                     animator.ResetTrigger("idle");
-                    animator.ResetTrigger("sprint");
-                    animator.SetTrigger("walk");
+                    animator.SetTrigger("sprint");
                 }
 
                 Patrol();
@@ -97,7 +93,6 @@ public class EnemyBehaviour : MonoBehaviour
                 if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Sprint"))
                 {
                     animator.ResetTrigger("idle");
-                    animator.ResetTrigger("walk");
                     animator.SetTrigger("sprint");
                 }
 
@@ -118,7 +113,6 @@ public class EnemyBehaviour : MonoBehaviour
                     isJumpscareTriggered = true;
                     agent.isStopped = true;
 
-                    animator.ResetTrigger("walk");
                     animator.ResetTrigger("sprint");
                     animator.ResetTrigger("idle");
                     animator.SetTrigger("jumpscare");
@@ -155,7 +149,7 @@ public class EnemyBehaviour : MonoBehaviour
             {
                 patrolIndex = Random.Range(0, patrolPoints.Length);
                 isWaiting = false;
-                animator.SetTrigger("walk");
+                animator.SetTrigger("sprint");
                 currentState = EnemyState.Patrol;
             }
         }
@@ -184,7 +178,7 @@ public class EnemyBehaviour : MonoBehaviour
         // Trigger walk cleanly
         animator.ResetTrigger("jumpscare");
         yield return null;
-        animator.SetTrigger("walk");
+        animator.SetTrigger("sprint");
 
         isJumpscareTriggered = false;
     }
