@@ -5,35 +5,10 @@ ModelImporter:
   internalIDToNameTable: []
   externalObjects:
   - first:
-      type: UnityEngine:Cubemap
-      assembly: UnityEngine.CoreModule
-      name: diffuse_cube
-    second: {fileID: 8900000, guid: 2c375ca39db779b43b558b56e15f6e9d, type: 3}
-  - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: StingrayPBS_IP_Proj
-    second: {fileID: 2100000, guid: 0585669a4495d2341a66309ac17a39bd, type: 2}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: Texture Atlas_standardSurface1_AlbedoTransparency.1001
-    second: {fileID: 2800000, guid: a38c32e21332f4d44847ee15f8a74d35, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: Texture Atlas_standardSurface1_MetallicSmoothness.1001
-    second: {fileID: 2800000, guid: 8dacd375916e39a478ffdc2e92ee52f3, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: Texture Atlas_standardSurface1_Normal.1001
-    second: {fileID: 2800000, guid: a6b666d60fdbc3243aaf9278088d2b0b, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: ibl_brdf_lut
-    second: {fileID: 2800000, guid: 43687919b9cbc644fa3bbf506e618200, type: 3}
+    second: {fileID: 2100000, guid: b25d9c040f767234c9208a9ca6be5c49, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

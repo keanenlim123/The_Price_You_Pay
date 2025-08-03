@@ -5,55 +5,15 @@ ModelImporter:
   internalIDToNameTable: []
   externalObjects:
   - first:
-      type: UnityEngine:Cubemap
-      assembly: UnityEngine.CoreModule
-      name: diffuse_cube
-    second: {fileID: 8900000, guid: a5dae2f746efc59488f9e2e28ce1aaaf, type: 3}
-  - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: StingrayPBS_IP_Proj
-    second: {fileID: 2100000, guid: 23f8c8a786a99a844a0e0125d8704d63, type: 2}
+    second: {fileID: 2100000, guid: b8efb4328d7c4344fb48687ae30ff85b, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: StingrayPBS_MopNBucket
     second: {fileID: 2100000, guid: 268b381750c79394987fe24e90b286f9, type: 2}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: Texture Atlas_standardSurface1_AlbedoTransparency.1001
-    second: {fileID: 2800000, guid: a4b70a110adda0e4c98b39f074428bbb, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: Texture Atlas_standardSurface1_MetallicSmoothness.1001
-    second: {fileID: 2800000, guid: 2bd4caf3c08eb3a4d9b01dcaeb00ac09, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: Texture Atlas_standardSurface1_Normal.1001
-    second: {fileID: 2800000, guid: 7bb68bdd7b1c1724fa021d5d6882bc12, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: TextureAtlas4MopNBucket_standardSurface1_AlbedoTransparency.1001
-    second: {fileID: 2800000, guid: 3986289e41c53c646b238e95ec5f51f7, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: TextureAtlas4MopNBucket_standardSurface1_MetallicSmoothness.1001
-    second: {fileID: 2800000, guid: 50b34f4a5c55db44da10cc6ac7cd1051, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: TextureAtlas4MopNBucket_standardSurface1_Normal.1001
-    second: {fileID: 2800000, guid: 0c93b23fce63afa4492e7e3635988dac, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: ibl_brdf_lut
-    second: {fileID: 2800000, guid: e71608f8d6a14cf4bb7db5d3bed6c904, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
