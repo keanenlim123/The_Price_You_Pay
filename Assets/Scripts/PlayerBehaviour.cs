@@ -13,6 +13,8 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     float rayHeightOffset = 1.0f;
 
+    BucketMop currentMop = null;
+
     void Update()
     {
         RaycastHit hit;
@@ -26,7 +28,13 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 canInteract = true;
                 currentDoor = hitObject.GetComponent<DoorBehaviour>();
-
+                currentMop = null;
+            }
+            if (hitObject.CompareTag("BucketMop"))
+            {
+                canInteract = true;
+                currentMop = hitObject.GetComponent<BucketMop>();
+                currentDoor = null;
             }
             Debug.DrawRay(rayOrigin, transform.forward * interactRange, Color.green);
         }
@@ -64,6 +72,10 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 Debug.Log("Interacting with Door2");
                 currentDoor.OpenDoor();
+            }
+            else if (currentMop != null)
+            {
+                currentMop.Collect(this);
             }
         }
     }
