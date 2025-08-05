@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Cubemap
       assembly: UnityEngine.CoreModule
       name: diffuse_cube
-    second: {fileID: 8900000, guid: dd8ece379d72544429698215a8ffd95d, type: 3}
+    second: {fileID: 8900000, guid: 64ef24f1a12fef8439a527bb82048e52, type: 3}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -18,22 +18,22 @@ ModelImporter:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: TextureAtlas4Building2_standardSurface1_AlbedoTransparency.1001
-    second: {fileID: 2800000, guid: 18a4900ab8fc44b4b9b2857a350e3710, type: 3}
+    second: {fileID: 2800000, guid: 6bb426feb7ba2c042949f796570473a1, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: TextureAtlas4Building2_standardSurface1_MetallicSmoothness.1001
-    second: {fileID: 2800000, guid: fa951e0f4d84ee84f86deb7964a62aa9, type: 3}
+    second: {fileID: 2800000, guid: 3ee5abeabda66804dab64039886e0cea, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: TextureAtlas4Building2_standardSurface1_Normal.1001
-    second: {fileID: 2800000, guid: ee53631e10bc96a41b1f3628f0675430, type: 3}
+    second: {fileID: 2800000, guid: 7f35fb3fe95f68843be09fc12f7f0c6a, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: ibl_brdf_lut
-    second: {fileID: 2800000, guid: caf25737b3f98f744b95e8aa06aa1b57, type: 3}
+    second: {fileID: 2800000, guid: 9bad98151ace53945bbf5a69be31d141, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
