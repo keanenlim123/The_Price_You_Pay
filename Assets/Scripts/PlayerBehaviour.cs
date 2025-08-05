@@ -15,6 +15,11 @@ public class PlayerBehaviour : MonoBehaviour
 
     BucketMop currentMop = null;
 
+    bool hasMop = false;
+    bool isMopEquipped = false;
+    public GameObject mopVisual;
+
+
     void Update()
     {
         RaycastHit hit;
@@ -40,7 +45,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
-    public void Respawn()  
+    public void Respawn()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
 
@@ -53,7 +58,7 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
-                rb.Sleep(); 
+                rb.Sleep();
             }
 
             Physics.SyncTransforms();
@@ -76,7 +81,17 @@ public class PlayerBehaviour : MonoBehaviour
             else if (currentMop != null)
             {
                 currentMop.Collect(this);
+                hasMop = true;
             }
+        }
+    }
+
+    void OnEquip()
+    {
+        if (hasMop)
+        {
+            isMopEquipped = !isMopEquipped;
+            mopVisual.SetActive(isMopEquipped);
         }
     }
 }
