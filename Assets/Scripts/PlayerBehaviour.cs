@@ -19,31 +19,65 @@ public class PlayerBehaviour : MonoBehaviour
     bool isMopEquipped = false;
     public GameObject mopVisual;
 
+    ShelfBehaviour currentShelf = null;
+
+    float interactHoldTimer = 0f;
+    float maxHoldTime = 3f;
+
+    FootStepsBehaviour currentFootstep = null;
+
+    CandyBehaviour currentCandyPile = null;
+
 
     void Update()
     {
         RaycastHit hit;
         canInteract = false;
+        currentDoor = null;
+        currentMop = null;
+        currentShelf = null;
+        currentFootstep = null;
+        currentCandyPile = null;
 
-        Vector3 rayOrigin = transform.position + Vector3.up * 1.0f;
+        Vector3 rayOrigin = transform.position + Vector3.up * rayHeightOffset;
         if (Physics.Raycast(rayOrigin, transform.forward, out hit, interactRange))
         {
             GameObject hitObject = hit.collider.gameObject;
+
             if (hitObject.CompareTag("Door"))
             {
                 canInteract = true;
                 currentDoor = hitObject.GetComponent<DoorBehaviour>();
-                currentMop = null;
             }
-            if (hitObject.CompareTag("BucketMop"))
+            else if (hitObject.CompareTag("BucketMop"))
             {
                 canInteract = true;
                 currentMop = hitObject.GetComponent<BucketMop>();
-                currentDoor = null;
             }
+            else if (hitObject.CompareTag("Shelf"))
+            {
+                Debug.Log("Shelf");
+                canInteract = true;
+                currentShelf = hitObject.GetComponent<ShelfBehaviour>();
+            }
+            else if (hitObject.CompareTag("Footstep") && isMopEquipped)
+            {
+                canInteract = true;
+                currentFootstep = hitObject.GetComponent<FootStepsBehaviour>();
+            }
+            else if (hitObject.CompareTag("CandyPile"))
+            {
+                canInteract = true;
+                currentCandyPile = hitObject.GetComponent<CandyBehaviour>();
+            }
+
+
             Debug.DrawRay(rayOrigin, transform.forward * interactRange, Color.green);
         }
+
+        HandleHoldInteraction(); // NEW FUNCTION
     }
+
 
     public void Respawn()
     {
@@ -92,6 +126,55 @@ public class PlayerBehaviour : MonoBehaviour
         {
             isMopEquipped = !isMopEquipped;
             mopVisual.SetActive(isMopEquipped);
+        }
+    }
+
+    void HandleHoldInteraction()
+    {
+        if (canInteract)
+        {
+            if (currentShelf != null)
+            {
+                interactHoldTimer += Time.deltaTime;
+
+                if (interactHoldTimer >= maxHoldTime)
+                {
+                    if (currentShelf.IsKnockedDown())
+                    {
+                        currentShelf.LiftShelf();
+                    }
+
+                    interactHoldTimer = 0f;
+                }
+            }
+            else if (currentCandyPile != null)
+            {
+                interactHoldTimer += Time.deltaTime;
+
+                if (interactHoldTimer >= maxHoldTime)
+                {
+                    currentCandyPile.SearchPile();
+                    interactHoldTimer = 0f;
+                }
+            }
+            else if (currentFootstep != null && isMopEquipped)
+            {
+                interactHoldTimer += Time.deltaTime;
+
+                if (interactHoldTimer >= maxHoldTime)
+                {
+                    currentFootstep.Clean();
+                    interactHoldTimer = 0f;
+                }
+            }
+            else
+            {
+                interactHoldTimer = 0f;
+            }
+        }
+        else
+        {
+            interactHoldTimer = 0f;
         }
     }
 }
