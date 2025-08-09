@@ -10,6 +10,9 @@ TagManager:
   - Shelf
   - Footstep
   - CandyPile
+  - StolenItem
+  - SlideDoor
+  - Friend
   layers:
   - Default
   - TransparentFX

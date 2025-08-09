@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -28,7 +30,17 @@ public class PlayerBehaviour : MonoBehaviour
 
     CandyBehaviour currentCandyPile = null;
 
+    public bool hasStolenItem = false;
+    StolenItemBehaviour currentStolenItem = null;
 
+    bool isTalkedToFriend = false;
+    public Camera friendCamera;
+    public Canvas friendDialogueCanvas;
+    public GameObject cubeToDestroy;
+    public Camera storeClerkCamera;
+
+    public Canvas dialogueCanvas;
+    private bool sequenceStarted = false;
     void Update()
     {
         RaycastHit hit;
@@ -38,6 +50,7 @@ public class PlayerBehaviour : MonoBehaviour
         currentShelf = null;
         currentFootstep = null;
         currentCandyPile = null;
+        currentStolenItem = null;
 
         Vector3 rayOrigin = transform.position + Vector3.up * rayHeightOffset;
         if (Physics.Raycast(rayOrigin, transform.forward, out hit, interactRange))
@@ -70,15 +83,40 @@ public class PlayerBehaviour : MonoBehaviour
                 canInteract = true;
                 currentCandyPile = hitObject.GetComponent<CandyBehaviour>();
             }
-
-
+            else if (hitObject.CompareTag("StolenItem") && !hasStolenItem)
+            {
+                canInteract = true;
+                currentStolenItem = hitObject.GetComponent<StolenItemBehaviour>();
+            }
+            else if (hasStolenItem && !sequenceStarted && hit.collider.CompareTag("SlideDoor"))
+            {
+                StartCoroutine(StoreClerkSequence());
+            }
+            else if (hitObject.CompareTag("Friend")) 
+            {
+                canInteract = true;
+                Debug.Log("Looking at friend, press interact to talk");
+            }
             Debug.DrawRay(rayOrigin, transform.forward * interactRange, Color.green);
         }
 
-        HandleHoldInteraction(); // NEW FUNCTION
+        HandleHoldInteraction();
     }
+    private IEnumerator StoreClerkSequence()
+    {
+        sequenceStarted = true;
 
 
+        storeClerkCamera.gameObject.SetActive(true);
+        storeClerkCamera.enabled = true;
+
+        // Show dialogue
+        if (dialogueCanvas != null) dialogueCanvas.gameObject.SetActive(true);
+
+        // Wait before loading next scene
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
     public void Respawn()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
@@ -109,7 +147,6 @@ public class PlayerBehaviour : MonoBehaviour
         {
             if (currentDoor != null)
             {
-                Debug.Log("Interacting with Door2");
                 currentDoor.OpenDoor();
             }
             else if (currentMop != null)
@@ -117,9 +154,20 @@ public class PlayerBehaviour : MonoBehaviour
                 currentMop.Collect(this);
                 hasMop = true;
             }
+            else if (currentStolenItem != null && !hasStolenItem)
+            {
+                currentStolenItem.Steal(this);
+            }
+            else if (!isTalkedToFriend)
+            {
+                StartFriendConversation();
+            }
+            else if (isTalkedToFriend)
+            {
+                EndFriendConversation();
+            }
         }
     }
-
     void OnEquip()
     {
         if (hasMop)
@@ -127,6 +175,38 @@ public class PlayerBehaviour : MonoBehaviour
             isMopEquipped = !isMopEquipped;
             mopVisual.SetActive(isMopEquipped);
         }
+    }
+    void StartFriendConversation()
+    {
+        if (isTalkedToFriend) return;
+
+        isTalkedToFriend = true;
+
+        // Show friend camera and dialogue UI
+        if (friendCamera != null)
+            friendCamera.gameObject.SetActive(true);
+
+        if (friendDialogueCanvas != null)
+            friendDialogueCanvas.gameObject.SetActive(true);
+
+        // Destroy the cube
+        if (cubeToDestroy != null)
+            Destroy(cubeToDestroy);
+
+        Debug.Log("Started conversation with friend");
+    }
+
+    void EndFriendConversation()
+    {
+        isTalkedToFriend = false;
+
+        if (friendCamera != null)
+            friendCamera.gameObject.SetActive(false);
+
+        if (friendDialogueCanvas != null)
+            friendDialogueCanvas.gameObject.SetActive(false);
+
+        Debug.Log("Friend conversation ended");
     }
 
     void HandleHoldInteraction()
