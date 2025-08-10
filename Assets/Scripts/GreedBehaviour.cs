@@ -32,6 +32,7 @@ public class GreedBehaviour : MonoBehaviour
     public GameObject camera1;
     public GameObject lighting;
 
+    public float shelfKnockRange = 2f;
     private bool isJumpscareTriggered = false;
     int randNum;
 
@@ -64,6 +65,8 @@ public class GreedBehaviour : MonoBehaviour
                 animator.ResetTrigger("sprint");
                 animator.ResetTrigger("jumpscare");
                 animator.SetTrigger("idle");
+
+
 
                 if (distanceToPlayer < chaseRange)
                 {
@@ -138,28 +141,32 @@ public class GreedBehaviour : MonoBehaviour
         if (!isWaiting)
         {
             agent.SetDestination(patrolPoints[patrolIndex].position);
+            Debug.Log($"Setting destination to patrol point {patrolIndex}: {patrolPoints[patrolIndex].position}");
 
             if (!agent.pathPending && agent.remainingDistance < 0.5f)
             {
                 isWaiting = true;
-                waitTimer = Random.Range(minIdleTime, maxIdleTime); // <- Here!
+                waitTimer = Random.Range(minIdleTime, maxIdleTime);
                 animator.SetTrigger("idle");
                 currentState = EnemyState.Idle;
+                Debug.Log("Reached patrol point, idling.");
             }
         }
         else
         {
             waitTimer -= Time.deltaTime;
-
             if (waitTimer <= 0f)
             {
                 patrolIndex = Random.Range(0, patrolPoints.Length);
                 isWaiting = false;
                 animator.SetTrigger("walk");
                 currentState = EnemyState.Patrol;
+                Debug.Log($"Moving to next patrol point: {patrolIndex}");
             }
         }
+        DetectNearbyShelves();
     }
+
 
 
     private IEnumerator HandleJumpscare()
@@ -189,4 +196,23 @@ public class GreedBehaviour : MonoBehaviour
         isJumpscareTriggered = false;
     }
 
+    void DetectNearbyShelves()
+    {
+        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, shelfKnockRange);
+
+        foreach (var col in nearbyObjects)
+        {
+            if (col.CompareTag("Shelf"))
+            {
+                ShelfBehaviour shelf = col.GetComponent<ShelfBehaviour>();
+                Debug.Log($"{gameObject.name} detected shelf {shelf.gameObject.name}, knocked down? {shelf.IsKnockedDown()}");
+
+                if (!shelf.IsKnockedDown())
+                {
+                    shelf.KnockDown();
+                    Debug.Log("Enemy knocked down a shelf!");
+                }
+            }
+        }
+    }
 }

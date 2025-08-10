@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class PrideBehaviour : MonoBehaviour
 {
@@ -31,8 +32,12 @@ public class PrideBehaviour : MonoBehaviour
 
     public GameObject camera1;
     public GameObject lighting;
-
     private bool isJumpscareTriggered = false;
+
+    public GameObject FootPrints;
+
+    public int FootChance = 1;
+
     int randNum;
 
     void Start()
@@ -64,6 +69,8 @@ public class PrideBehaviour : MonoBehaviour
                 animator.ResetTrigger("sprint");
                 animator.ResetTrigger("jumpscare");
                 animator.SetTrigger("idle");
+
+
 
                 if (distanceToPlayer < chaseRange)
                 {
@@ -145,6 +152,21 @@ public class PrideBehaviour : MonoBehaviour
                 waitTimer = Random.Range(minIdleTime, maxIdleTime); // <- Here!
                 animator.SetTrigger("idle");
                 currentState = EnemyState.Idle;
+
+                if (FootStepsBehaviour.footstepamount > 5)
+                {
+                    randNum = Random.Range(0, 5);
+                    if (randNum > FootChance && FootPrints != null)
+                    {
+                        Vector3 spawnPos = patrolPoints[patrolIndex].position;
+                        spawnPos.y -= 1.2f;
+
+                        Instantiate(FootPrints, spawnPos, Quaternion.identity);
+                        Debug.Log("Footprints spawned at idle point: " + patrolIndex);
+
+                        FootStepsBehaviour.footstepamount++;
+                    }
+                }
             }
         }
         else
@@ -188,5 +210,4 @@ public class PrideBehaviour : MonoBehaviour
 
         isJumpscareTriggered = false;
     }
-
 }
