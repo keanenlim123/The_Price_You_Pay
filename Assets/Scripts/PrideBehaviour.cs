@@ -38,6 +38,8 @@ public class PrideBehaviour : MonoBehaviour
 
     public int FootChance = 1;
 
+    public PlayerBehaviour playerBehaviour;
+
     int randNum;
 
     void Start()
@@ -51,6 +53,14 @@ public class PrideBehaviour : MonoBehaviour
         {
             Debug.LogError("NavMeshAgent is missing from " + gameObject.name);
             enabled = false;
+        }
+        if (playerBehaviour == null && player != null)
+        {
+            playerBehaviour = player.GetComponent<PlayerBehaviour>();
+            if (playerBehaviour == null)
+            {
+                Debug.LogWarning("PlayerBehaviour component not found on player.");
+            }
         }
 
         currentState = EnemyState.Patrol;
@@ -155,8 +165,7 @@ public class PrideBehaviour : MonoBehaviour
 
                 if (FootStepsBehaviour.footstepamount > 5)
                 {
-                    randNum = Random.Range(0, 5);
-                    if (randNum > FootChance && FootPrints != null)
+                    if (FootPrints != null)
                     {
                         Vector3 spawnPos = patrolPoints[patrolIndex].position;
                         spawnPos.y -= 1.2f;
@@ -164,7 +173,14 @@ public class PrideBehaviour : MonoBehaviour
                         Instantiate(FootPrints, spawnPos, Quaternion.identity);
                         Debug.Log("Footprints spawned at idle point: " + patrolIndex);
 
+                        // Increase the static footprint count (if you want)
                         FootStepsBehaviour.footstepamount++;
+
+                        // Decrease player's cleaned footprints count by 1 safely
+                        if (playerBehaviour != null)
+                        {
+                            playerBehaviour.DecreaseFootprintsCleanedCount();
+                        }
                     }
                 }
             }

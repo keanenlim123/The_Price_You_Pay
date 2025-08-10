@@ -1,14 +1,25 @@
 using UnityEngine;
+using TMPro;  // Make sure to include this
 
 public class CandyBehaviour : MonoBehaviour
 {
     public bool isCorrectPile = false;
+
+    // Reference to the TextMeshProUGUI component for task1 text
+    public TextMeshProUGUI task1;
 
     public void SearchPile()
     {
         if (isCorrectPile)
         {
             Debug.Log("Correct candy pile! Destroying all piles.");
+
+            // Add strikethrough by wrapping text with <s> tags
+            if (task1 != null)
+            {
+                task1.text = $"<s>{task1.text}</s>";
+            }
+
             GameObject[] allPiles = GameObject.FindGameObjectsWithTag("CandyPile");
             foreach (GameObject pile in allPiles)
             {

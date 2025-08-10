@@ -13,6 +13,7 @@ TagManager:
   - StolenItem
   - SlideDoor
   - Friend
+  - Wall
   layers:
   - Default
   - TransparentFX

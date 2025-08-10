@@ -41,6 +41,20 @@ public class PlayerBehaviour : MonoBehaviour
 
     public Canvas dialogueCanvas;
     private bool sequenceStarted = false;
+
+    FriendBehaviour currentFriend = null;
+
+    [SerializeField]
+    public TextMeshProUGUI Task;
+    [SerializeField]
+    public TextMeshProUGUI Task2;
+
+    [SerializeField]
+    public TextMeshProUGUI Interact;
+
+    private int shelvesLiftedCount = 0;
+    private int footprintsCleanedCount = 0;
+
     void Update()
     {
         RaycastHit hit;
@@ -61,45 +75,73 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 canInteract = true;
                 currentDoor = hitObject.GetComponent<DoorBehaviour>();
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Press E to Open Door";
             }
             else if (hitObject.CompareTag("BucketMop"))
             {
                 canInteract = true;
                 currentMop = hitObject.GetComponent<BucketMop>();
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Press E to Collect Mop";
             }
             else if (hitObject.CompareTag("Shelf"))
             {
-                Debug.Log("Shelf");
                 canInteract = true;
                 currentShelf = hitObject.GetComponent<ShelfBehaviour>();
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Hold E to Lift Shelf";
             }
             else if (hitObject.CompareTag("Footstep") && isMopEquipped)
             {
                 canInteract = true;
                 currentFootstep = hitObject.GetComponent<FootStepsBehaviour>();
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Hold E to Clean Footstep";
             }
             else if (hitObject.CompareTag("CandyPile"))
             {
                 canInteract = true;
                 currentCandyPile = hitObject.GetComponent<CandyBehaviour>();
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Hold E to Search Pile";
             }
             else if (hitObject.CompareTag("StolenItem") && !hasStolenItem)
             {
                 canInteract = true;
                 currentStolenItem = hitObject.GetComponent<StolenItemBehaviour>();
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Press E to steal " + hitObject.name;
             }
             else if (hasStolenItem && !sequenceStarted && hit.collider.CompareTag("SlideDoor"))
             {
                 StartCoroutine(StoreClerkSequence());
+                Interact.text = "";
             }
-            else if (hitObject.CompareTag("Friend")) 
+            else if (hitObject.CompareTag("Friend"))
             {
                 canInteract = true;
-                Debug.Log("Looking at friend, press interact to talk");
+                currentFriend = hitObject.GetComponent<FriendBehaviour>();
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Press E to Talk";
             }
+            else if (hitObject.CompareTag("Wall"))
+            {
+                canInteract = true;
+                Interact.gameObject.SetActive(true);
+                Interact.text = "Talk with your friend first";
+            }
+            else
+            {
+                Interact.text = "";
+            }
+
             Debug.DrawRay(rayOrigin, transform.forward * interactRange, Color.green);
         }
-
+        else
+        {
+            Interact.text = "";
+        }
         HandleHoldInteraction();
     }
     private IEnumerator StoreClerkSequence()
@@ -134,6 +176,7 @@ public class PlayerBehaviour : MonoBehaviour
             }
 
             Physics.SyncTransforms();
+            Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
         }
         else
         {
@@ -153,18 +196,19 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 currentMop.Collect(this);
                 hasMop = true;
+                Task.text = "- Clean footprints 0 / 10";
             }
             else if (currentStolenItem != null && !hasStolenItem)
             {
                 currentStolenItem.Steal(this);
+                Task.text = "- Meet up with your friend";
             }
-            else if (!isTalkedToFriend)
+            else if (currentFriend != null)
             {
-                StartFriendConversation();
-            }
-            else if (isTalkedToFriend)
-            {
-                EndFriendConversation();
+                if (!isTalkedToFriend)
+                    StartFriendConversation();
+                else
+                    EndFriendConversation();
             }
         }
     }
@@ -178,6 +222,7 @@ public class PlayerBehaviour : MonoBehaviour
     }
     void StartFriendConversation()
     {
+        Interact.gameObject.SetActive(false);
         if (isTalkedToFriend) return;
 
         isTalkedToFriend = true;
@@ -192,6 +237,9 @@ public class PlayerBehaviour : MonoBehaviour
         // Destroy the cube
         if (cubeToDestroy != null)
             Destroy(cubeToDestroy);
+
+        if (Task != null)
+            Task.text = "- Enter the store and steal something";
 
         Debug.Log("Started conversation with friend");
     }
@@ -222,8 +270,10 @@ public class PlayerBehaviour : MonoBehaviour
                     if (currentShelf.IsKnockedDown())
                     {
                         currentShelf.LiftShelf();
-                    }
 
+                        shelvesLiftedCount++;
+                        Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
+                    }
                     interactHoldTimer = 0f;
                 }
             }
@@ -244,9 +294,13 @@ public class PlayerBehaviour : MonoBehaviour
                 if (interactHoldTimer >= maxHoldTime)
                 {
                     currentFootstep.Clean();
+                    footprintsCleanedCount++;
+                    Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
+
                     interactHoldTimer = 0f;
                 }
             }
+
             else
             {
                 interactHoldTimer = 0f;
@@ -256,5 +310,21 @@ public class PlayerBehaviour : MonoBehaviour
         {
             interactHoldTimer = 0f;
         }
+    }
+    public void ResetShelvesLiftedCount()
+    {
+        shelvesLiftedCount = 0;
+        Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
+    }
+
+    public void DecreaseShelvesLiftedCount()
+    {
+        shelvesLiftedCount = Mathf.Max(0, shelvesLiftedCount - 1);
+        Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
+    }
+    public void DecreaseFootprintsCleanedCount()
+    {
+        footprintsCleanedCount = Mathf.Max(0, footprintsCleanedCount - 1);
+        Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
     }
 }

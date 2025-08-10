@@ -205,12 +205,17 @@ public class GreedBehaviour : MonoBehaviour
             if (col.CompareTag("Shelf"))
             {
                 ShelfBehaviour shelf = col.GetComponent<ShelfBehaviour>();
-                Debug.Log($"{gameObject.name} detected shelf {shelf.gameObject.name}, knocked down? {shelf.IsKnockedDown()}");
 
                 if (!shelf.IsKnockedDown())
                 {
                     shelf.KnockDown();
                     Debug.Log("Enemy knocked down a shelf!");
+
+                    PlayerBehaviour playerScript = player.GetComponent<PlayerBehaviour>();
+                    if (playerScript != null)
+                    {
+                        playerScript.DecreaseShelvesLiftedCount();  // Decrease by 1 instead of reset
+                    }
                 }
             }
         }

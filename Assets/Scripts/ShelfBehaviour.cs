@@ -7,6 +7,10 @@ public class ShelfBehaviour : MonoBehaviour
 
     private bool isKnockedDown = false;
 
+    // Declare an event for shelf knockdown
+    public delegate void ShelfKnockedDownHandler(ShelfBehaviour shelf);
+    public static event ShelfKnockedDownHandler OnShelfKnockedDown;
+
     void Start()
     {
         isKnockedDown = downShelf.activeSelf;
@@ -28,19 +32,27 @@ public class ShelfBehaviour : MonoBehaviour
         {
             Debug.LogError("Shelf visuals not assigned!");
         }
+
+        // Fire event to notify listeners (like player)
+        OnShelfKnockedDown?.Invoke(this);
     }
 
     public void LiftShelf()
     {
-        if (!isKnockedDown) return;
+        if (!isKnockedDown)
+        {
+            Debug.Log($"{gameObject.name} is already lifted.");
+            return;
+        }
 
         isKnockedDown = false;
-        Debug.Log("LiftShelf: Setting upShelf = true, downShelf = false");
+        Debug.Log($"{gameObject.name} LiftShelf called! upShelf: {upShelf}, downShelf: {downShelf}");
 
         if (upShelf != null && downShelf != null)
         {
             upShelf.SetActive(true);
             downShelf.SetActive(false);
+            Debug.Log("Shelf visuals updated: upShelf active, downShelf inactive.");
         }
         else
         {
