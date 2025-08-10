@@ -164,7 +164,6 @@ public class GreedBehaviour : MonoBehaviour
                 Debug.Log($"Moving to next patrol point: {patrolIndex}");
             }
         }
-        DetectNearbyShelves();
     }
 
 
@@ -196,28 +195,4 @@ public class GreedBehaviour : MonoBehaviour
         isJumpscareTriggered = false;
     }
 
-    void DetectNearbyShelves()
-    {
-        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, shelfKnockRange);
-
-        foreach (var col in nearbyObjects)
-        {
-            if (col.CompareTag("Shelf"))
-            {
-                ShelfBehaviour shelf = col.GetComponent<ShelfBehaviour>();
-
-                if (!shelf.IsKnockedDown())
-                {
-                    shelf.KnockDown();
-                    Debug.Log("Enemy knocked down a shelf!");
-
-                    PlayerBehaviour playerScript = player.GetComponent<PlayerBehaviour>();
-                    if (playerScript != null)
-                    {
-                        playerScript.DecreaseShelvesLiftedCount();  // Decrease by 1 instead of reset
-                    }
-                }
-            }
-        }
-    }
 }

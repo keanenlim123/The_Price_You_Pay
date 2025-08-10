@@ -7,13 +7,27 @@ public class ShelfBehaviour : MonoBehaviour
 
     private bool isKnockedDown = false;
 
-    // Declare an event for shelf knockdown
-    public delegate void ShelfKnockedDownHandler(ShelfBehaviour shelf);
-    public static event ShelfKnockedDownHandler OnShelfKnockedDown;
+    private PlayerBehaviour playerBehaviour;
+
+    private float knockCooldown = 1f;
+    private float knockTimer = 0f;
 
     void Start()
     {
         isKnockedDown = downShelf.activeSelf;
+
+        // Find the player and cache the PlayerBehaviour reference (assuming player tagged "Player")
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            playerBehaviour = playerObj.GetComponent<PlayerBehaviour>();
+            if (playerBehaviour == null)
+                Debug.LogWarning("PlayerBehaviour script not found on Player object");
+        }
+        else
+        {
+            Debug.LogWarning("Player object not found in scene");
+        }
     }
 
     public void KnockDown()
@@ -21,47 +35,50 @@ public class ShelfBehaviour : MonoBehaviour
         if (isKnockedDown) return;
 
         isKnockedDown = true;
-        Debug.Log("KnockDown: Setting upShelf = false, downShelf = true");
+        Debug.Log($"[KnockDown] Shelf: {gameObject.name}");
 
         if (upShelf != null && downShelf != null)
         {
             upShelf.SetActive(false);
             downShelf.SetActive(true);
         }
-        else
-        {
-            Debug.LogError("Shelf visuals not assigned!");
-        }
 
-        // Fire event to notify listeners (like player)
-        OnShelfKnockedDown?.Invoke(this);
+        // Tell player to decrease shelf count by 1
+        if (playerBehaviour != null)
+        {
+            playerBehaviour.DecreaseShelvesLiftedCount();
+        }
     }
 
     public void LiftShelf()
     {
-        if (!isKnockedDown)
-        {
-            Debug.Log($"{gameObject.name} is already lifted.");
-            return;
-        }
+        if (!isKnockedDown) return;
 
         isKnockedDown = false;
-        Debug.Log($"{gameObject.name} LiftShelf called! upShelf: {upShelf}, downShelf: {downShelf}");
+        Debug.Log($"[LiftShelf] Shelf: {gameObject.name}");
 
         if (upShelf != null && downShelf != null)
         {
             upShelf.SetActive(true);
             downShelf.SetActive(false);
-            Debug.Log("Shelf visuals updated: upShelf active, downShelf inactive.");
-        }
-        else
-        {
-            Debug.LogError("Shelf visuals not assigned!");
         }
     }
 
     public bool IsKnockedDown()
     {
         return isKnockedDown;
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Greed"))
+        {
+            knockTimer -= Time.deltaTime;
+            if (knockTimer <= 0f)
+            {
+                KnockDown();
+                knockTimer = knockCooldown;
+            }
+        }
     }
 }

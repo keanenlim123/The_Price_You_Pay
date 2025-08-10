@@ -9,6 +9,7 @@ public class FootStepsBehaviour : MonoBehaviour
     {
         footstepamount++;
         Debug.Log("CLEAN");
+        Debug.Log(footstepamount);
         Destroy(gameObject);
         
     }

@@ -163,18 +163,17 @@ public class PrideBehaviour : MonoBehaviour
                 animator.SetTrigger("idle");
                 currentState = EnemyState.Idle;
 
-                if (FootStepsBehaviour.footstepamount > 5)
+                if (FootStepsBehaviour.footstepamount > 5 && FootStepsBehaviour.footstepamount < 10)
                 {
                     if (FootPrints != null)
                     {
                         Vector3 spawnPos = patrolPoints[patrolIndex].position;
-                        spawnPos.y -= 1.2f;
+                        spawnPos.y -= 0f;
 
                         Instantiate(FootPrints, spawnPos, Quaternion.identity);
                         Debug.Log("Footprints spawned at idle point: " + patrolIndex);
 
-                        // Increase the static footprint count (if you want)
-                        FootStepsBehaviour.footstepamount++;
+                        FootStepsBehaviour.footstepamount--;
 
                         // Decrease player's cleaned footprints count by 1 safely
                         if (playerBehaviour != null)

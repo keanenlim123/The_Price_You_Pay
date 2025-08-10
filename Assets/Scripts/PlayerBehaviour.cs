@@ -52,6 +52,10 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     public TextMeshProUGUI Interact;
 
+    [SerializeField]
+    private TextMeshProUGUI interactionTimerText;
+
+
     private int shelvesLiftedCount = 0;
     private int footprintsCleanedCount = 0;
 
@@ -259,56 +263,73 @@ public class PlayerBehaviour : MonoBehaviour
 
     void HandleHoldInteraction()
     {
-        if (canInteract)
+        if (canInteract && Input.GetKey(KeyCode.E)) // ✅ Only when holding E
         {
+            bool isHolding = false;
+
             if (currentShelf != null)
             {
+                isHolding = true;
                 interactHoldTimer += Time.deltaTime;
+                float timeLeft = Mathf.Max(0f, maxHoldTime - interactHoldTimer);
+                interactionTimerText.gameObject.SetActive(true);
+                interactionTimerText.text = $"Hold... {timeLeft:F1}s";
 
                 if (interactHoldTimer >= maxHoldTime)
                 {
                     if (currentShelf.IsKnockedDown())
                     {
                         currentShelf.LiftShelf();
-
                         shelvesLiftedCount++;
                         Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
                     }
                     interactHoldTimer = 0f;
+                    interactionTimerText.gameObject.SetActive(false);
                 }
             }
             else if (currentCandyPile != null)
             {
+                isHolding = true;
                 interactHoldTimer += Time.deltaTime;
+                float timeLeft = Mathf.Max(0f, maxHoldTime - interactHoldTimer);
+                interactionTimerText.gameObject.SetActive(true);
+                interactionTimerText.text = $"Searching... {timeLeft:F1}s";
 
                 if (interactHoldTimer >= maxHoldTime)
                 {
                     currentCandyPile.SearchPile();
                     interactHoldTimer = 0f;
+                    interactionTimerText.gameObject.SetActive(false);
                 }
             }
             else if (currentFootstep != null && isMopEquipped)
             {
+                isHolding = true;
                 interactHoldTimer += Time.deltaTime;
+                float timeLeft = Mathf.Max(0f, maxHoldTime - interactHoldTimer);
+                interactionTimerText.gameObject.SetActive(true);
+                interactionTimerText.text = $"Cleaning... {timeLeft:F1}s";
 
                 if (interactHoldTimer >= maxHoldTime)
                 {
                     currentFootstep.Clean();
                     footprintsCleanedCount++;
                     Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
-
                     interactHoldTimer = 0f;
+                    interactionTimerText.gameObject.SetActive(false);
                 }
             }
 
-            else
+            if (!isHolding)
             {
                 interactHoldTimer = 0f;
+                interactionTimerText.gameObject.SetActive(false);
             }
         }
         else
         {
             interactHoldTimer = 0f;
+            interactionTimerText.gameObject.SetActive(false);
         }
     }
     public void ResetShelvesLiftedCount()
