@@ -33,6 +33,10 @@ public class EnvyBehaviour : MonoBehaviour
     private bool isJumpscareTriggered = false;
     int randNum;
 
+    // 🔊 Added audio sources
+    public AudioSource footstepsAudio;
+    public AudioSource jumpscareAudio;
+
     void Start()
     {
         randNum = Random.Range(0, patrolPoints.Length);
@@ -49,11 +53,33 @@ public class EnvyBehaviour : MonoBehaviour
         currentState = EnemyState.Patrol;
         patrolIndex = randNum;
         animator.SetTrigger("sprint");
+
+        // Ensure footsteps loop is disabled at start
+        if (footstepsAudio != null)
+        {
+            footstepsAudio.loop = true;
+            footstepsAudio.Stop();
+        }
     }
 
     void Update()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // 🔊 Handle footsteps volume based on proximity
+        if (footstepsAudio != null && currentState != EnemyState.Jumpscare)
+        {
+            if (currentState == EnemyState.Chase || currentState == EnemyState.Patrol)
+            {
+                if (!footstepsAudio.isPlaying) footstepsAudio.Play();
+                float volume = Mathf.Clamp01(1f - (distanceToPlayer / chaseRange));
+                footstepsAudio.volume = volume;
+            }
+            else
+            {
+                if (footstepsAudio.isPlaying) footstepsAudio.Stop();
+            }
+        }
 
         switch (currentState)
         {
@@ -121,6 +147,14 @@ public class EnvyBehaviour : MonoBehaviour
                     lighting.SetActive(true);
                     playermodel.SetActive(false);
 
+                    // 🔊 Play jumpscare sound
+                    if (jumpscareAudio != null)
+                        jumpscareAudio.Play();
+
+                    // Stop footsteps when jumpscare starts
+                    if (footstepsAudio != null && footstepsAudio.isPlaying)
+                        footstepsAudio.Stop();
+
                     StartCoroutine(HandleJumpscare());
                 }
                 break;
@@ -155,7 +189,6 @@ public class EnvyBehaviour : MonoBehaviour
         }
     }
 
-
     private IEnumerator HandleJumpscare()
     {
         yield return new WaitForSeconds(1f); // Jumpscare plays
@@ -182,5 +215,4 @@ public class EnvyBehaviour : MonoBehaviour
 
         isJumpscareTriggered = false;
     }
-
 }
