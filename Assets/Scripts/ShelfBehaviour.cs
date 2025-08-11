@@ -6,6 +6,7 @@ public class ShelfBehaviour : MonoBehaviour
     public GameObject downShelf;
 
     private bool isKnockedDown = false;
+    private bool hasBeenKnockedByGreed = false;
 
     private PlayerBehaviour playerBehaviour;
 
@@ -16,7 +17,6 @@ public class ShelfBehaviour : MonoBehaviour
     {
         isKnockedDown = downShelf.activeSelf;
 
-        // Find the player and cache the PlayerBehaviour reference (assuming player tagged "Player")
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
@@ -34,7 +34,14 @@ public class ShelfBehaviour : MonoBehaviour
     {
         if (isKnockedDown) return;
 
+        if (hasBeenKnockedByGreed) return;
+
+        if (playerBehaviour != null && playerBehaviour.shelvesLiftedCount >= 10)
+            return;
+
         isKnockedDown = true;
+        hasBeenKnockedByGreed = true;
+
         Debug.Log($"[KnockDown] Shelf: {gameObject.name}");
 
         if (upShelf != null && downShelf != null)
@@ -43,7 +50,6 @@ public class ShelfBehaviour : MonoBehaviour
             downShelf.SetActive(true);
         }
 
-        // Tell player to decrease shelf count by 1
         if (playerBehaviour != null)
         {
             playerBehaviour.DecreaseShelvesLiftedCount();
@@ -73,6 +79,11 @@ public class ShelfBehaviour : MonoBehaviour
     {
         if (other.CompareTag("Greed"))
         {
+            if (playerBehaviour != null && playerBehaviour.shelvesLiftedCount >= 10)
+                return;
+
+            if (hasBeenKnockedByGreed) return;
+
             knockTimer -= Time.deltaTime;
             if (knockTimer <= 0f)
             {

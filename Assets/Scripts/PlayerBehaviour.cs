@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+
     bool canInteract = false;
     DoorBehaviour currentDoor = null;
     public Transform teleport;
@@ -55,9 +56,15 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI interactionTimerText;
 
+    public int shelvesLiftedCount = 0;
+    public int footprintsCleanedCount = 0;
 
-    private int shelvesLiftedCount = 0;
-    private int footprintsCleanedCount = 0;
+    [Header("Cutscene & UI Fade")]
+    public GameObject cameraGameObject;
+    public Canvas animatorCanvas;
+    public float fadeDuration = 2f;
+
+
 
     void Update()
     {
@@ -263,7 +270,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     void HandleHoldInteraction()
     {
-        if (canInteract && Input.GetKey(KeyCode.E)) // ✅ Only when holding E
+        if (canInteract && Input.GetKey(KeyCode.E))
         {
             bool isHolding = false;
 
@@ -281,7 +288,7 @@ public class PlayerBehaviour : MonoBehaviour
                     {
                         currentShelf.LiftShelf();
                         shelvesLiftedCount++;
-                        Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
+                        UpdateTaskUI();
                     }
                     interactHoldTimer = 0f;
                     interactionTimerText.gameObject.SetActive(false);
@@ -314,7 +321,7 @@ public class PlayerBehaviour : MonoBehaviour
                 {
                     currentFootstep.Clean();
                     footprintsCleanedCount++;
-                    Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
+                    UpdateTaskUI();
                     interactHoldTimer = 0f;
                     interactionTimerText.gameObject.SetActive(false);
                 }
@@ -336,16 +343,71 @@ public class PlayerBehaviour : MonoBehaviour
     {
         shelvesLiftedCount = 0;
         Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
+        UpdateTaskUI();
     }
 
     public void DecreaseShelvesLiftedCount()
     {
         shelvesLiftedCount = Mathf.Max(0, shelvesLiftedCount - 1);
         Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
+        UpdateTaskUI(); ;
     }
     public void DecreaseFootprintsCleanedCount()
     {
         footprintsCleanedCount = Mathf.Max(0, footprintsCleanedCount - 1);
         Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
+        UpdateTaskUI();
+    }
+    private void UpdateTaskUI()
+    {
+        if (footprintsCleanedCount >= 10)
+            Task.text = $"<s>- Clean footprints {footprintsCleanedCount} / 10</s>";
+        else
+            Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
+
+        if (shelvesLiftedCount >= 10)
+            Task2.text = $"<s>- Shelves lifted: {shelvesLiftedCount} / 10</s>";
+        else
+            Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
+
+        CheckAllTasksCompleted();
+    }
+
+
+    void CheckAllTasksCompleted()
+    {
+        if (shelvesLiftedCount >= 10 && footprintsCleanedCount >= 10 && CandyBehaviour.candyBarFound)
+        {
+            Debug.Log("All tasks completed! Starting coroutine.");
+            StartCoroutine(CompleteGameSequence());
+        }
+    }
+
+
+    private IEnumerator CompleteGameSequence()
+    {
+        // 1. Show camera GameObject
+        cameraGameObject.SetActive(true);
+
+        // 2. Wait 10 seconds
+        yield return new WaitForSeconds(10f);
+
+        // 3. Hide camera GameObject and show Canvas with Animator
+        cameraGameObject.SetActive(false);
+
+        animatorCanvas.gameObject.SetActive(true);
+
+        // Optionally trigger animator if needed
+        Animator animator = animatorCanvas.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.Play("YourAnimationStateName"); // replace with your animation state name
+        }
+
+        // 4. Wait 43 seconds
+        yield return new WaitForSeconds(43f);
+
+        // 5. Load Main Menu scene (assumed index 0)
+        SceneManager.LoadScene(0);
     }
 }

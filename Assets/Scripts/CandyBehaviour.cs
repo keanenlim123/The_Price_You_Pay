@@ -5,6 +5,8 @@ public class CandyBehaviour : MonoBehaviour
 {
     public bool isCorrectPile = false;
 
+    public static bool candyBarFound = false;
+
     // Reference to the TextMeshProUGUI component for task1 text
     public TextMeshProUGUI task1;
 
@@ -12,6 +14,7 @@ public class CandyBehaviour : MonoBehaviour
     {
         if (isCorrectPile)
         {
+            candyBarFound = true;
             Debug.Log("Correct candy pile! Destroying all piles.");
 
             // Add strikethrough by wrapping text with <s> tags
