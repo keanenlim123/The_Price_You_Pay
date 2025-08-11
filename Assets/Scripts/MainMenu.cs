@@ -26,12 +26,12 @@ public class MainMenu : MonoBehaviour
         buildObject.SetActive(true);
 
         // Wait for 33 seconds
-        yield return new WaitForSeconds(33f);
+        yield return new WaitForSeconds(40f);
 
         // Load the next scene in build order
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 
-        Debug.Log("Next scene loaded after 33 seconds.");
+        Debug.Log("Next scene loaded after 40 seconds.");
     }
     public void QuitGame()
     {
