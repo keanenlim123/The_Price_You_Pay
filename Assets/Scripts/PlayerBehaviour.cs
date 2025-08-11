@@ -287,8 +287,7 @@ public class PlayerBehaviour : MonoBehaviour
                     if (currentShelf.IsKnockedDown())
                     {
                         currentShelf.LiftShelf();
-                        shelvesLiftedCount++;
-                        UpdateTaskUI();
+                        UpdateShelvesUI();
                     }
                     interactHoldTimer = 0f;
                     interactionTimerText.gameObject.SetActive(false);
@@ -321,7 +320,7 @@ public class PlayerBehaviour : MonoBehaviour
                 {
                     currentFootstep.Clean();
                     footprintsCleanedCount++;
-                    UpdateTaskUI();
+                    UpdateFootprintsUI();
                     interactHoldTimer = 0f;
                     interactionTimerText.gameObject.SetActive(false);
                 }
@@ -343,28 +342,33 @@ public class PlayerBehaviour : MonoBehaviour
     {
         shelvesLiftedCount = 0;
         Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
-        UpdateTaskUI();
+        UpdateShelvesUI();
     }
 
     public void DecreaseShelvesLiftedCount()
     {
         shelvesLiftedCount = Mathf.Max(0, shelvesLiftedCount - 1);
         Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
-        UpdateTaskUI(); ;
+        UpdateShelvesUI();
     }
     public void DecreaseFootprintsCleanedCount()
     {
         footprintsCleanedCount = Mathf.Max(0, footprintsCleanedCount - 1);
         Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
-        UpdateTaskUI();
+        UpdateFootprintsUI();
     }
-    private void UpdateTaskUI()
+    public void UpdateFootprintsUI()
     {
         if (footprintsCleanedCount >= 10)
             Task.text = $"<s>- Clean footprints {footprintsCleanedCount} / 10</s>";
         else
             Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
 
+        CheckAllTasksCompleted();
+    }
+
+    public void UpdateShelvesUI()
+    {
         if (shelvesLiftedCount >= 10)
             Task2.text = $"<s>- Shelves lifted: {shelvesLiftedCount} / 10</s>";
         else
