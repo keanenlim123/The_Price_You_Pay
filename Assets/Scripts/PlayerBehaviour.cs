@@ -65,7 +65,7 @@ public class PlayerBehaviour : MonoBehaviour
     public Canvas animatorCanvas;
     public float fadeDuration = 2f;
 
-
+    public GameObject mopUI;
 
     void Update()
     {
@@ -208,6 +208,7 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 currentMop.Collect(this);
                 hasMop = true;
+                mopUI.SetActive(true);
                 Task.text = "- Clean footprints 0 / 10";
             }
             else if (currentStolenItem != null && !hasStolenItem)
