@@ -415,8 +415,8 @@ public class PlayerBehaviour : MonoBehaviour
             animator.Play("YourAnimationStateName"); // replace with your animation state name
         }
 
-        // 4. Wait 43 seconds
-        yield return new WaitForSeconds(43f);
+        // 4. Wait 80 seconds
+        yield return new WaitForSeconds(80f);
 
         // 5. Load Main Menu scene (assumed index 0)
         SceneManager.LoadScene(0);
