@@ -1,7 +1,9 @@
 using UnityEngine;
 
 public class BucketMop : MonoBehaviour
+
 {
+    public AudioSource pickupAudio;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -13,8 +15,13 @@ public class BucketMop : MonoBehaviour
     {
 
     }
+    
     public void Collect(PlayerBehaviour player)
     {
+        if (pickupAudio != null && !pickupAudio.isPlaying)
+        {
+            pickupAudio.Play();
+        }
         Destroy(gameObject);
     }
 }
