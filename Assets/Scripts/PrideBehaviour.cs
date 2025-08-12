@@ -184,7 +184,7 @@ public class PrideBehaviour : MonoBehaviour
                 animator.SetTrigger("idle");
                 currentState = EnemyState.Idle;
 
-                if (FootStepsBehaviour.footstepamount > 5 && FootStepsBehaviour.footstepamount < 10)
+                if (FootStepsBehaviour.footstepamount > 7 && FootStepsBehaviour.footstepamount < 10)
                 {
                     if (FootPrints != null)
                     {
