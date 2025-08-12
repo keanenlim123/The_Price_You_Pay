@@ -21,6 +21,7 @@ public class PlayerBehaviour : MonoBehaviour
     bool hasMop = false;
     bool isMopEquipped = false;
     public GameObject mopVisual;
+    public AudioSource moppingAudio;
 
     ShelfBehaviour currentShelf = null;
 
@@ -315,6 +316,11 @@ public class PlayerBehaviour : MonoBehaviour
                 float timeLeft = Mathf.Max(0f, maxHoldTime - interactHoldTimer);
                 interactionTimerText.gameObject.SetActive(true);
                 interactionTimerText.text = $"Cleaning... {timeLeft:F1}s";
+                if (moppingAudio != null && !moppingAudio.isPlaying)
+                {
+                  moppingAudio.Play();
+                }
+                
 
                 if (interactHoldTimer >= maxHoldTime)
                 {

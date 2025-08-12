@@ -36,6 +36,10 @@ public class GreedBehaviour : MonoBehaviour
     private bool isJumpscareTriggered = false;
     int randNum;
 
+    // 🎵 New audio fields
+    public AudioSource footstepsAudio;
+    public AudioSource jumpscareAudio;
+
     void Start()
     {
         randNum = Random.Range(0, patrolPoints.Length);
@@ -52,11 +56,25 @@ public class GreedBehaviour : MonoBehaviour
         currentState = EnemyState.Patrol;
         patrolIndex = randNum;
         animator.SetTrigger("walk");
+
+        // Make sure footsteps loop if assigned
+        if (footstepsAudio != null)
+        {
+            footstepsAudio.loop = true;
+            footstepsAudio.Play();
+        }
     }
 
     void Update()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // 🔊 Adjust footsteps volume based on distance
+        if (footstepsAudio != null)
+        {
+            float volume = Mathf.Clamp01(1 - (distanceToPlayer / chaseRange));
+            footstepsAudio.volume = volume;
+        }
 
         switch (currentState)
         {
@@ -65,8 +83,6 @@ public class GreedBehaviour : MonoBehaviour
                 animator.ResetTrigger("sprint");
                 animator.ResetTrigger("jumpscare");
                 animator.SetTrigger("idle");
-
-
 
                 if (distanceToPlayer < chaseRange)
                 {
@@ -130,6 +146,10 @@ public class GreedBehaviour : MonoBehaviour
                     lighting.SetActive(true);
                     playermodel.SetActive(false);
 
+                    // 🎵 Play jumpscare audio
+                    if (jumpscareAudio != null)
+                        jumpscareAudio.Play();
+
                     StartCoroutine(HandleJumpscare());
                 }
                 break;
@@ -166,8 +186,6 @@ public class GreedBehaviour : MonoBehaviour
         }
     }
 
-
-
     private IEnumerator HandleJumpscare()
     {
         yield return new WaitForSeconds(1f); // Jumpscare plays
@@ -194,5 +212,4 @@ public class GreedBehaviour : MonoBehaviour
 
         isJumpscareTriggered = false;
     }
-
 }

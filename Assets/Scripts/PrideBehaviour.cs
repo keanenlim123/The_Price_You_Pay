@@ -21,7 +21,6 @@ public class PrideBehaviour : MonoBehaviour
     public float sprintSpeed = 5f;
 
     public float waitTimer;
-
     public float waitDuration = 2f;
     public float minIdleTime = 1f;
     public float maxIdleTime = 3f;
@@ -35,10 +34,14 @@ public class PrideBehaviour : MonoBehaviour
     private bool isJumpscareTriggered = false;
 
     public GameObject FootPrints;
-
     public int FootChance = 1;
-
     public PlayerBehaviour playerBehaviour;
+
+    // 🔊 Added Audio
+    public AudioSource footstepsAudio;
+    public AudioSource jumpscareAudio;
+    public float maxFootstepVolume = 1f;
+    public float footstepVolumeDistance = 10f;
 
     int randNum;
 
@@ -66,11 +69,27 @@ public class PrideBehaviour : MonoBehaviour
         currentState = EnemyState.Patrol;
         patrolIndex = randNum;
         animator.SetTrigger("walk");
+
+        // Setup footsteps loop
+        if (footstepsAudio != null)
+        {
+            footstepsAudio.loop = true;
+            footstepsAudio.Play();
+        }
     }
 
     void Update()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // 🔊 Update footstep volume
+        if (footstepsAudio != null)
+        {
+            float volume = Mathf.Clamp01(1 - (distanceToPlayer / footstepVolumeDistance));
+            footstepsAudio.volume = volume * maxFootstepVolume;
+
+            footstepsAudio.mute = (currentState != EnemyState.Patrol && currentState != EnemyState.Chase);
+        }
 
         switch (currentState)
         {
@@ -79,8 +98,6 @@ public class PrideBehaviour : MonoBehaviour
                 animator.ResetTrigger("sprint");
                 animator.ResetTrigger("jumpscare");
                 animator.SetTrigger("idle");
-
-
 
                 if (distanceToPlayer < chaseRange)
                 {
@@ -144,6 +161,10 @@ public class PrideBehaviour : MonoBehaviour
                     lighting.SetActive(true);
                     playermodel.SetActive(false);
 
+                    // 🔊 Play jumpscare sound
+                    if (jumpscareAudio != null)
+                        jumpscareAudio.Play();
+
                     StartCoroutine(HandleJumpscare());
                 }
                 break;
@@ -159,7 +180,7 @@ public class PrideBehaviour : MonoBehaviour
             if (!agent.pathPending && agent.remainingDistance < 0.5f)
             {
                 isWaiting = true;
-                waitTimer = Random.Range(minIdleTime, maxIdleTime); // <- Here!
+                waitTimer = Random.Range(minIdleTime, maxIdleTime);
                 animator.SetTrigger("idle");
                 currentState = EnemyState.Idle;
 
@@ -175,7 +196,6 @@ public class PrideBehaviour : MonoBehaviour
 
                         FootStepsBehaviour.footstepamount--;
 
-                        // Decrease player's cleaned footprints count by 1 safely
                         if (playerBehaviour != null)
                         {
                             playerBehaviour.DecreaseFootprintsCleanedCount();
@@ -198,10 +218,9 @@ public class PrideBehaviour : MonoBehaviour
         }
     }
 
-
     private IEnumerator HandleJumpscare()
     {
-        yield return new WaitForSeconds(1f); // Jumpscare plays
+        yield return new WaitForSeconds(1f);
 
         camera1.SetActive(false);
         lighting.SetActive(false);
@@ -213,12 +232,11 @@ public class PrideBehaviour : MonoBehaviour
             pb.Respawn();
         }
 
-        yield return new WaitForSeconds(0.5f); // Prevent instant re-catch
+        yield return new WaitForSeconds(0.5f);
 
         agent.isStopped = false;
         currentState = EnemyState.Patrol;
 
-        // Trigger walk cleanly
         animator.ResetTrigger("jumpscare");
         yield return null;
         animator.SetTrigger("walk");

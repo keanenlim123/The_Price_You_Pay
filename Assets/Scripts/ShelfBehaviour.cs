@@ -5,12 +5,14 @@ public class ShelfBehaviour : MonoBehaviour
     public GameObject upShelf;
     public GameObject downShelf;
 
+    public AudioSource pushUpAudio; // Audio for pushing shelf back up
+
     private bool isKnockedDown = false;
     private int liftCount = 0;             // How many times shelf lifted
     private bool knockdownAllowed = true; // Disable knockdown after 2 lifts
     private bool hasAddedPointThisLift = false;
 
-    // NEW: Track if this shelf currently counts towards the player's lifted shelf count
+    // Track if this shelf currently counts towards the player's lifted shelf count
     private bool hasCountedAsLifted = false;
 
     public PlayerBehaviour playerBehaviour;
@@ -65,7 +67,6 @@ public class ShelfBehaviour : MonoBehaviour
         }
     }
 
-
     public void LiftShelf()
     {
         if (!isKnockedDown) return; // Only lift if knocked down
@@ -79,6 +80,12 @@ public class ShelfBehaviour : MonoBehaviour
         {
             upShelf.SetActive(true);
             downShelf.SetActive(false);
+        }
+
+        // Play push-up sound
+        if (pushUpAudio != null && !pushUpAudio.isPlaying)
+        {
+            pushUpAudio.Play();
         }
 
         // Only add to player's lifted count once per lift
@@ -99,7 +106,6 @@ public class ShelfBehaviour : MonoBehaviour
             Debug.Log("[LiftShelf] Knockdown disabled after second lift.");
         }
     }
-
 
     public bool IsKnockedDown()
     {
