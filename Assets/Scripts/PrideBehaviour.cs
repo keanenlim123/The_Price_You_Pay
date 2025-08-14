@@ -1,3 +1,18 @@
+/// <summary>
+/// PrideBehaviour.cs  
+/// This script controls the AI behavior of the "Pride" monster in the game.  
+/// Pride operates under a finite state machine with four states: Idle, Patrol, Chase, and Jumpscare.  
+/// While patrolling, Pride may spawn muddy footprints if the player has nearly completed their cleaning objective,  
+/// increasing the difficulty. If Pride detects the player within a certain range, it transitions to Chase mode,  
+/// moving faster to pursue them. Upon close contact, Pride triggers a jumpscare sequence, temporarily halting  
+/// the player’s progress.  
+/// The script manages AI navigation using Unity's NavMeshAgent, controls animations, spawns additional objectives  
+/// (footprints), and integrates audio feedback for footsteps and jumpscares.  
+/// </summary>
+/// <author>Chia Jia Cong Justin</author>
+/// <date>10/8/2025</date>
+/// <StudentID>S10266690C</StudentID>
+
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
@@ -5,46 +20,150 @@ using Unity.VisualScripting;
 
 public class PrideBehaviour : MonoBehaviour
 {
+    /// <summary>
+    /// The different AI states for the Pride enemy.
+    /// </summary>
     public enum EnemyState { Idle, Patrol, Chase, Jumpscare }
+
+    /// <summary>
+    /// Current active state of the Pride enemy.
+    /// </summary>
     public EnemyState currentState;
 
+    /// <summary>
+    /// Array of patrol points that Pride moves between while patrolling.
+    /// </summary>
     public Transform[] patrolPoints;
+
+    /// <summary>
+    /// Index of the current patrol point being targeted.
+    /// </summary>
     private int patrolIndex;
 
+    /// <summary>
+    /// Reference to the player's Transform for tracking and chasing.
+    /// </summary>
     public Transform player;
 
+    /// <summary>
+    /// Reference to the player's 3D model GameObject for visibility control during jumpscares.
+    /// </summary>
     public GameObject playermodel;
+
+    /// <summary>
+    /// The detection range within which Pride starts chasing the player.
+    /// </summary>
     public float chaseRange = 10f;
+
+    /// <summary>
+    /// Distance threshold at which Pride will trigger a jumpscare when close to the player.
+    /// </summary>
     public float catchDistance = 2f;
 
+    /// <summary>
+    /// Movement speed while patrolling.
+    /// </summary>
     public float walkSpeed = 2f;
+
+    /// <summary>
+    /// Movement speed while chasing the player.
+    /// </summary>
     public float sprintSpeed = 5f;
 
+    /// <summary>
+    /// Timer for how long Pride waits at a patrol point.
+    /// </summary>
     public float waitTimer;
+
+    /// <summary>
+    /// Duration to wait at a patrol point.
+    /// </summary>
     public float waitDuration = 2f;
+
+    /// <summary>
+    /// Minimum random idle wait time.
+    /// </summary>
     public float minIdleTime = 1f;
+
+    /// <summary>
+    /// Maximum random idle wait time.
+    /// </summary>
     public float maxIdleTime = 3f;
+
+    /// <summary>
+    /// Flag indicating whether Pride is currently waiting.
+    /// </summary>
     private bool isWaiting = false;
 
+    /// <summary>
+    /// Reference to the NavMeshAgent for navigation and pathfinding.
+    /// </summary>
     private NavMeshAgent agent;
+
+    /// <summary>
+    /// Reference to the Animator for controlling Pride’s animations.
+    /// </summary>
     private Animator animator;
 
+    /// <summary>
+    /// Reference to the jumpscare camera for visual effect.
+    /// </summary>
     public GameObject camera1;
+
+    /// <summary>
+    /// Reference to lighting used during jumpscare sequences.
+    /// </summary>
     public GameObject lighting;
+
+    /// <summary>
+    /// Flag to ensure jumpscare is triggered only once at a time.
+    /// </summary>
     private bool isJumpscareTriggered = false;
 
+    /// <summary>
+    /// Footprint prefab to spawn as an additional player objective.
+    /// </summary>
     public GameObject FootPrints;
+
+    /// <summary>
+    /// Chance value (not fully used in this script) for spawning footprints.
+    /// </summary>
     public int FootChance = 1;
+
+    /// <summary>
+    /// Reference to the PlayerBehaviour script for updating objective counters.
+    /// </summary>
     public PlayerBehaviour playerBehaviour;
 
-    // 🔊 Added Audio
+    /// <summary>
+    /// Audio source for Pride’s footsteps.
+    /// </summary>
     public AudioSource footstepsAudio;
+
+    /// <summary>
+    /// Audio source for Pride’s jumpscare sound.
+    /// </summary>
     public AudioSource jumpscareAudio;
+
+    /// <summary>
+    /// Maximum volume of the footsteps sound.
+    /// </summary>
     public float maxFootstepVolume = 1f;
+
+    /// <summary>
+    /// Distance at which footstep audio starts fading.
+    /// </summary>
     public float footstepVolumeDistance = 10f;
 
+    /// <summary>
+    /// Random number for selecting initial patrol point.
+    /// </summary>
     int randNum;
 
+    /// <summary>
+    /// Initializes the Pride enemy, selecting a random patrol point, setting animation triggers,
+    /// and starting footstep audio playback.
+    /// </summary>
     void Start()
     {
         randNum = Random.Range(0, patrolPoints.Length);
@@ -70,7 +189,6 @@ public class PrideBehaviour : MonoBehaviour
         patrolIndex = randNum;
         animator.SetTrigger("walk");
 
-        // Setup footsteps loop
         if (footstepsAudio != null)
         {
             footstepsAudio.loop = true;
@@ -78,16 +196,18 @@ public class PrideBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles AI state updates, distance checks to the player, audio adjustments,
+    /// and transitions between states based on conditions each frame.
+    /// </summary>
     void Update()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // 🔊 Update footstep volume
         if (footstepsAudio != null)
         {
             float volume = Mathf.Clamp01(1 - (distanceToPlayer / footstepVolumeDistance));
             footstepsAudio.volume = volume * maxFootstepVolume;
-
             footstepsAudio.mute = (currentState != EnemyState.Patrol && currentState != EnemyState.Chase);
         }
 
@@ -161,7 +281,6 @@ public class PrideBehaviour : MonoBehaviour
                     lighting.SetActive(true);
                     playermodel.SetActive(false);
 
-                    // 🔊 Play jumpscare sound
                     if (jumpscareAudio != null)
                         jumpscareAudio.Play();
 
@@ -171,6 +290,10 @@ public class PrideBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Moves Pride to patrol points, waits at each, and may spawn footprints if the player
+    /// has nearly completed their cleaning objective.
+    /// </summary>
     void Patrol()
     {
         if (!isWaiting)
@@ -189,8 +312,6 @@ public class PrideBehaviour : MonoBehaviour
                     if (FootPrints != null)
                     {
                         Vector3 spawnPos = patrolPoints[patrolIndex].position;
-                        spawnPos.y -= 0f;
-
                         Instantiate(FootPrints, spawnPos, Quaternion.identity);
                         Debug.Log("Footprints spawned at idle point: " + patrolIndex);
 
@@ -218,6 +339,10 @@ public class PrideBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles the jumpscare sequence: plays animation, shows jumpscare camera,
+    /// disables player model, and respawns player after a delay.
+    /// </summary>
     private IEnumerator HandleJumpscare()
     {
         yield return new WaitForSeconds(1f);
