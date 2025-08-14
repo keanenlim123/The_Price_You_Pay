@@ -1,45 +1,85 @@
+/// <summary>
+/// GreedBehaviour.cs  
+/// This script controls the AI behaviour of the Greed enemy, including movement, detection,
+/// and interactions with the player. It manages how Greed chases, reacts to player actions,
+/// and transitions between behaviour states.
+/// </summary>
+/// <author> Lim Xue Zhi Conan </author>
+/// <date> 11/8/2025 </date>
+/// <StudentID> S10269214H </StudentID>
+
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
+/// <summary>
+/// Controls the AI behaviour of the Greed enemy, including patrolling, chasing the player, and executing a jumpscare.
+/// Handles movement between patrol points, detecting the player within chase range,
+/// adjusting footstep audio volume dynamically, and triggering game events upon catching the player.
+/// </summary>
 public class GreedBehaviour : MonoBehaviour
 {
+    /// <summary>Represents the current behaviour state of Greed.</summary>
     public enum EnemyState { Idle, Patrol, Chase, Jumpscare }
+    /// <summary>The current state of the enemy.</summary>
     public EnemyState currentState;
 
+    /// <summary>List of patrol points for Greed to move between.</summary>
     public Transform[] patrolPoints;
+    /// <summary>The index of the current patrol point.</summary>
     private int patrolIndex;
 
+    /// <summary>Reference to the player’s Transform.</summary>
     public Transform player;
 
+    /// <summary>The player's in-game model.</summary>
     public GameObject playermodel;
+    /// <summary>The distance at which Greed will start chasing the player.</summary>
     public float chaseRange = 10f;
+    /// <summary>The distance at which Greed will trigger a jumpscare.</summary>
     public float catchDistance = 2f;
 
+    /// <summary>Walking speed of Greed during patrol.</summary>
     public float walkSpeed = 2f;
+    /// <summary>Sprinting speed of Greed during chase.</summary>
     public float sprintSpeed = 5f;
 
+    /// <summary>Tracks how long Greed has been waiting at a patrol point.</summary>
     public float waitTimer;
-
+    /// <summary>How long Greed waits at a patrol point before moving on.</summary>
     public float waitDuration = 2f;
+    /// <summary>Minimum time Greed will idle between patrol points.</summary>
     public float minIdleTime = 1f;
+    /// <summary>Maximum time Greed will idle between patrol points.</summary>
     public float maxIdleTime = 3f;
+    /// <summary>Whether Greed is currently waiting between patrol points.</summary>
     private bool isWaiting = false;
 
+    /// <summary>Reference to the NavMeshAgent controlling Greed's navigation.</summary>
     private NavMeshAgent agent;
+    /// <summary>Reference to Greed's Animator for controlling animations.</summary>
     private Animator animator;
 
+    /// <summary>The camera used for the jumpscare sequence.</summary>
     public GameObject camera1;
+    /// <summary>Lighting object used during the jumpscare.</summary>
     public GameObject lighting;
 
+    /// <summary>The range in which Greed can knock over shelves.</summary>
     public float shelfKnockRange = 2f;
+    /// <summary>Whether the jumpscare sequence has been triggered.</summary>
     private bool isJumpscareTriggered = false;
+    /// <summary>Random number used for selecting patrol points.</summary>
     int randNum;
 
-    // 🎵 New audio fields
+    /// <summary>AudioSource for Greed's footsteps.</summary>
     public AudioSource footstepsAudio;
+    /// <summary>AudioSource for Greed's jumpscare sound.</summary>
     public AudioSource jumpscareAudio;
 
+    /// <summary>
+    /// Initializes variables, sets a random patrol point, and ensures footsteps audio is looping.
+    /// </summary>
     void Start()
     {
         randNum = Random.Range(0, patrolPoints.Length);
@@ -65,11 +105,15 @@ public class GreedBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates Greed's behaviour each frame depending on the current state.
+    /// Adjusts footstep volume dynamically based on player's distance.
+    /// </summary>
     void Update()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // 🔊 Adjust footsteps volume based on distance
+        // Adjust footsteps volume based on distance
         if (footstepsAudio != null)
         {
             float volume = Mathf.Clamp01(1 - (distanceToPlayer / chaseRange));
@@ -146,7 +190,7 @@ public class GreedBehaviour : MonoBehaviour
                     lighting.SetActive(true);
                     playermodel.SetActive(false);
 
-                    // 🎵 Play jumpscare audio
+                    // Play jumpscare audio
                     if (jumpscareAudio != null)
                         jumpscareAudio.Play();
 
@@ -156,6 +200,9 @@ public class GreedBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles Greed's movement between patrol points, including idle waiting periods.
+    /// </summary>
     void Patrol()
     {
         if (!isWaiting)
@@ -186,6 +233,10 @@ public class GreedBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles the jumpscare sequence, including camera and lighting changes,
+    /// resetting the player, and resuming patrol after a delay.
+    /// </summary>
     private IEnumerator HandleJumpscare()
     {
         yield return new WaitForSeconds(1f); // Jumpscare plays
