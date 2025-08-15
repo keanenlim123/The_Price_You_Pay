@@ -608,7 +608,7 @@ public class PlayerBehaviour : MonoBehaviour
         // 4. Wait 43 seconds
         yield return new WaitForSeconds(80f);
 
-        // 5. Load Main Menu scene (assumed index 0)
+        // 5. Load Main Menu scene
         SceneManager.LoadScene(0);
     }
 }
