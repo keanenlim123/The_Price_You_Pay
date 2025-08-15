@@ -17,66 +17,197 @@ using UnityEngine.SceneManagement;
 public class PlayerBehaviour : MonoBehaviour
 {
 
+    [Header("Interaction Settings")]
+    /// <summary>
+    /// Whether the player is currently able to interact with something.
+    /// </summary>
     bool canInteract = false;
-    DoorBehaviour currentDoor = null;
-    public Transform teleport;
 
-    [SerializeField]
-    float interactRange = 2f;
-    [SerializeField]
-    float rayHeightOffset = 1.0f;
+    /// <summary>
+    /// Maximum range for interaction raycasts.
+    /// </summary>
+    [SerializeField] float interactRange = 2f;
 
-    BucketMop currentMop = null;
+    /// <summary>
+    /// Vertical offset for the interaction raycast start point.
+    /// </summary>
+    [SerializeField] float rayHeightOffset = 1.0f;
 
-    bool hasMop = false;
-    bool isMopEquipped = false;
-    public GameObject mopVisual;
-    public AudioSource moppingAudio;
-
-    ShelfBehaviour currentShelf = null;
-
+    /// <summary>
+    /// Current time the interact key has been held.
+    /// </summary>
     float interactHoldTimer = 0f;
+
+    /// <summary>
+    /// Required hold time for certain actions.
+    /// </summary>
     float maxHoldTime = 3f;
 
-    FootStepsBehaviour currentFootstep = null;
+    /// <summary>
+    /// UI text showing interaction timer progress.
+    /// </summary>
+    [SerializeField] private TextMeshProUGUI interactionTimerText;
 
-    CandyBehaviour currentCandyPile = null;
+    /// <summary>
+    /// UI text showing interact prompt.
+    /// </summary>
+    [SerializeField] public TextMeshProUGUI Interact;
 
-    public bool hasStolenItem = false;
-    StolenItemBehaviour currentStolenItem = null;
 
-    bool isTalkedToFriend = false;
-    public Camera friendCamera;
-    public Canvas friendDialogueCanvas;
-    public GameObject cubeToDestroy;
-    public Camera storeClerkCamera;
+    [Header("Door & Teleport")]
+    /// <summary>
+    /// Reference to the door the player is currently looking at.
+    /// </summary>
+    DoorBehaviour currentDoor = null;
 
-    public Canvas dialogueCanvas;
-    private bool sequenceStarted = false;
+    /// <summary>
+    /// Position to teleport to when respawning.
+    /// </summary>
+    public Transform teleport;
 
-    FriendBehaviour currentFriend = null;
 
-    [SerializeField]
-    public TextMeshProUGUI Task;
-    [SerializeField]
-    public TextMeshProUGUI Task2;
+    [Header("Mop Settings")]
+    /// <summary>
+    /// Reference to the mop currently in the scene.
+    /// </summary>
+    BucketMop currentMop = null;
 
-    [SerializeField]
-    public TextMeshProUGUI Interact;
+    /// <summary>
+    /// Whether the player has picked up the mop.
+    /// </summary>
+    bool hasMop = false;
 
-    [SerializeField]
-    private TextMeshProUGUI interactionTimerText;
+    /// <summary>
+    /// Whether the mop is currently equipped.
+    /// </summary>
+    bool isMopEquipped = false;
 
-    public int shelvesLiftedCount = 0;
-    public int footprintsCleanedCount = 0;
+    /// <summary>
+    /// The mop visual GameObject.
+    /// </summary>
+    public GameObject mopVisual;
 
-    [Header("Cutscene & UI Fade")]
-    public GameObject cameraGameObject;
-    public Canvas animatorCanvas;
-    public float fadeDuration = 2f;
+    /// <summary>
+    /// Audio source played when mopping footprints.
+    /// </summary>
+    public AudioSource moppingAudio;
 
+    /// <summary>
+    /// UI icon or element representing the mop.
+    /// </summary>
     public GameObject mopUI;
 
+
+    [Header("Object References")]
+    /// <summary>
+    /// Reference to the shelf currently being interacted with.
+    /// </summary>
+    ShelfBehaviour currentShelf = null;
+
+    /// <summary>
+    /// Reference to the current footstep to clean.
+    /// </summary>
+    FootStepsBehaviour currentFootstep = null;
+
+    /// <summary>
+    /// Reference to the candy pile currently being searched.
+    /// </summary>
+    CandyBehaviour currentCandyPile = null;
+
+    /// <summary>
+    /// Whether the player currently has a stolen item.
+    /// </summary>
+    public bool hasStolenItem = false;
+
+    /// <summary>
+    /// Reference to the stolen item currently held.
+    /// </summary>
+    StolenItemBehaviour currentStolenItem = null;
+
+
+    [Header("Friend Interaction")]
+    /// <summary>
+    /// Whether the player has already talked to the friend.
+    /// </summary>
+    bool isTalkedToFriend = false;
+
+    /// <summary>
+    /// Camera used for friend dialogue view.
+    /// </summary>
+    public Camera friendCamera;
+
+    /// <summary>
+    /// Canvas used for friend dialogue UI.
+    /// </summary>
+    public Canvas friendDialogueCanvas;
+
+    /// <summary>
+    /// Object to destroy during friend interaction sequence.
+    /// </summary>
+    public GameObject cubeToDestroy;
+
+    /// <summary>
+    /// Camera used for store clerk cutscene.
+    /// </summary>
+    public Camera storeClerkCamera;
+
+    /// <summary>
+    /// General dialogue UI canvas.
+    /// </summary>
+    public Canvas dialogueCanvas;
+
+    /// <summary>
+    /// Whether the friend interaction sequence has started.
+    /// </summary>
+    private bool sequenceStarted = false;
+
+    /// <summary>
+    /// Reference to the current friend being interacted with.
+    /// </summary>
+    FriendBehaviour currentFriend = null;
+
+
+    [Header("Task Tracking")]
+    /// <summary>
+    /// UI text for the main task description.
+    /// </summary>
+    [SerializeField] public TextMeshProUGUI Task;
+
+    /// <summary>
+    /// UI text for the secondary task description.
+    /// </summary>
+    [SerializeField] public TextMeshProUGUI Task2;
+
+    /// <summary>
+    /// Number of shelves the player has lifted.
+    /// </summary>
+    public int shelvesLiftedCount = 0;
+
+    /// <summary>
+    /// Number of footprints the player has cleaned.
+    /// </summary>
+    public int footprintsCleanedCount = 0;
+
+
+    [Header("Cutscene & UI Fade")]
+    /// <summary>
+    /// Camera used for cutscenes.
+    /// </summary>
+    public GameObject cameraGameObject;
+
+    /// <summary>
+    /// Canvas containing the fade animation.
+    /// </summary>
+    public Canvas animatorCanvas;
+
+    /// <summary>
+    /// Duration of fade transitions in seconds.
+    /// </summary>
+    public float fadeDuration = 2f;
+
+    /// <summary>
+    /// Called once per frame to handle raycasting and interaction checks.
+    /// </summary>
     void Update()
     {
         RaycastHit hit;
@@ -166,6 +297,10 @@ public class PlayerBehaviour : MonoBehaviour
         }
         HandleHoldInteraction();
     }
+
+    /// <summary>
+    /// Triggers the store clerk cutscene sequence when the player tries to leave after stealing.
+    /// </summary>
     private IEnumerator StoreClerkSequence()
     {
         sequenceStarted = true;
@@ -181,6 +316,11 @@ public class PlayerBehaviour : MonoBehaviour
         yield return new WaitForSeconds(2f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
+
+    /// <summary>
+    /// Teleports the player back to the spawn/teleport point.
+    /// Resets shelves lifted UI progress.
+    /// </summary>
     public void Respawn()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
@@ -206,6 +346,10 @@ public class PlayerBehaviour : MonoBehaviour
         }
 
     }
+
+    /// <summary>
+    /// Handles immediate interaction actions (e.g., opening doors, picking up mop).
+    /// </summary>
     void OnInteract()
     {
         if (canInteract)
@@ -235,6 +379,10 @@ public class PlayerBehaviour : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// Toggles the mop's equipped state.
+    /// </summary>
     void OnEquip()
     {
         if (hasMop)
@@ -243,6 +391,10 @@ public class PlayerBehaviour : MonoBehaviour
             mopVisual.SetActive(isMopEquipped);
         }
     }
+
+    /// <summary>
+    /// Starts the conversation sequence with the friend.
+    /// </summary>
     void StartFriendConversation()
     {
         Interact.gameObject.SetActive(false);
@@ -267,6 +419,9 @@ public class PlayerBehaviour : MonoBehaviour
         Debug.Log("Started conversation with friend");
     }
 
+    /// <summary>
+    /// Ends the conversation sequence with the friend.
+    /// </summary>
     void EndFriendConversation()
     {
         isTalkedToFriend = false;
@@ -280,6 +435,9 @@ public class PlayerBehaviour : MonoBehaviour
         Debug.Log("Friend conversation ended");
     }
 
+    /// <summary>
+    /// Handles hold-to-interact mechanics for shelves, candy piles, and footprints.
+    /// </summary>
     void HandleHoldInteraction()
     {
         if (canInteract && Input.GetKey(KeyCode.E))
@@ -329,9 +487,9 @@ public class PlayerBehaviour : MonoBehaviour
                 interactionTimerText.text = $"Cleaning... {timeLeft:F1}s";
                 if (moppingAudio != null && !moppingAudio.isPlaying)
                 {
-                  moppingAudio.Play();
+                    moppingAudio.Play();
                 }
-                
+
 
                 if (interactHoldTimer >= maxHoldTime)
                 {
@@ -355,6 +513,10 @@ public class PlayerBehaviour : MonoBehaviour
             interactionTimerText.gameObject.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// Resets the shelves lifted counter and updates UI.
+    /// </summary>
     public void ResetShelvesLiftedCount()
     {
         shelvesLiftedCount = 0;
@@ -362,18 +524,29 @@ public class PlayerBehaviour : MonoBehaviour
         UpdateShelvesUI();
     }
 
+    /// <summary>
+    /// Decreases the shelves lifted counter by one and updates UI.
+    /// </summary>
     public void DecreaseShelvesLiftedCount()
     {
         shelvesLiftedCount = Mathf.Max(0, shelvesLiftedCount - 1);
         Task2.text = $"- Shelves lifted: {shelvesLiftedCount} / 10";
         UpdateShelvesUI();
     }
+
+    /// <summary>
+    /// Decreases the footprints cleaned counter by one and updates UI.
+    /// </summary>
     public void DecreaseFootprintsCleanedCount()
     {
         footprintsCleanedCount = Mathf.Max(0, footprintsCleanedCount - 1);
         Task.text = $"- Clean footprints {footprintsCleanedCount} / 10";
         UpdateFootprintsUI();
     }
+
+    /// <summary>
+    /// Updates the footprints cleaned UI text.
+    /// </summary>
     public void UpdateFootprintsUI()
     {
         if (footprintsCleanedCount >= 10)
@@ -384,6 +557,9 @@ public class PlayerBehaviour : MonoBehaviour
         CheckAllTasksCompleted();
     }
 
+    /// <summary>
+    /// Updates the shelves lifted UI text.
+    /// </summary>
     public void UpdateShelvesUI()
     {
         if (shelvesLiftedCount >= 10)
@@ -394,7 +570,9 @@ public class PlayerBehaviour : MonoBehaviour
         CheckAllTasksCompleted();
     }
 
-
+    /// <summary>
+    /// Checks if all game objectives are completed, and if so, starts the final cutscene.
+    /// </summary>
     void CheckAllTasksCompleted()
     {
         if (shelvesLiftedCount >= 10 && footprintsCleanedCount >= 10 && CandyBehaviour.candyBarFound)
@@ -404,7 +582,9 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Final sequence coroutine that plays a cutscene and returns to main menu.
+    /// </summary>
     private IEnumerator CompleteGameSequence()
     {
         // 1. Show camera GameObject

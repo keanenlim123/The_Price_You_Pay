@@ -167,6 +167,12 @@ public class ShelfBehaviour : MonoBehaviour
     {
         if (other.CompareTag("Greed"))
         {
+            if (liftCount >= 10)
+            {
+                Debug.Log("[OnTriggerEnter] Lift count >= 10, shelf will not be knocked down.");
+                return;
+            }
+
             KnockDown();
         }
     }

@@ -16,7 +16,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using Unity.VisualScripting;
 
 public class PrideBehaviour : MonoBehaviour
 {
@@ -30,6 +29,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     public EnemyState currentState;
 
+    [Header("Patrol Settings")]
     /// <summary>
     /// Array of patrol points that Pride moves between while patrolling.
     /// </summary>
@@ -40,6 +40,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     private int patrolIndex;
 
+    [Header("Player Detection")]
     /// <summary>
     /// Reference to the player's Transform for tracking and chasing.
     /// </summary>
@@ -60,6 +61,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     public float catchDistance = 2f;
 
+    [Header("Movement Speeds")]
     /// <summary>
     /// Movement speed while patrolling.
     /// </summary>
@@ -70,6 +72,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     public float sprintSpeed = 5f;
 
+    [Header("Idle & Wait Timers")]
     /// <summary>
     /// Timer for how long Pride waits at a patrol point.
     /// </summary>
@@ -95,6 +98,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     private bool isWaiting = false;
 
+    [Header("Components")]
     /// <summary>
     /// Reference to the NavMeshAgent for navigation and pathfinding.
     /// </summary>
@@ -105,6 +109,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     private Animator animator;
 
+    [Header("Jumpscare Settings")]
     /// <summary>
     /// Reference to the jumpscare camera for visual effect.
     /// </summary>
@@ -120,6 +125,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     private bool isJumpscareTriggered = false;
 
+    [Header("Footprint & Objectives")]
     /// <summary>
     /// Footprint prefab to spawn as an additional player objective.
     /// </summary>
@@ -135,6 +141,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     public PlayerBehaviour playerBehaviour;
 
+    [Header("Audio")]
     /// <summary>
     /// Audio source for Pride’s footsteps.
     /// </summary>
@@ -155,6 +162,7 @@ public class PrideBehaviour : MonoBehaviour
     /// </summary>
     public float footstepVolumeDistance = 10f;
 
+    [Header("Patrol Randomization")]
     /// <summary>
     /// Random number for selecting initial patrol point.
     /// </summary>

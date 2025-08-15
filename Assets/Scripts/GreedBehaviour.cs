@@ -24,14 +24,15 @@ public class GreedBehaviour : MonoBehaviour
     /// <summary>The current state of the enemy.</summary>
     public EnemyState currentState;
 
+    [Header("Patrol Settings")]
     /// <summary>List of patrol points for Greed to move between.</summary>
     public Transform[] patrolPoints;
     /// <summary>The index of the current patrol point.</summary>
     private int patrolIndex;
 
+    [Header("Player Detection")]
     /// <summary>Reference to the player’s Transform.</summary>
     public Transform player;
-
     /// <summary>The player's in-game model.</summary>
     public GameObject playermodel;
     /// <summary>The distance at which Greed will start chasing the player.</summary>
@@ -39,11 +40,13 @@ public class GreedBehaviour : MonoBehaviour
     /// <summary>The distance at which Greed will trigger a jumpscare.</summary>
     public float catchDistance = 2f;
 
+    [Header("Movement Speeds")]
     /// <summary>Walking speed of Greed during patrol.</summary>
     public float walkSpeed = 2f;
     /// <summary>Sprinting speed of Greed during chase.</summary>
     public float sprintSpeed = 5f;
 
+    [Header("Idle & Wait Times")]
     /// <summary>Tracks how long Greed has been waiting at a patrol point.</summary>
     public float waitTimer;
     /// <summary>How long Greed waits at a patrol point before moving on.</summary>
@@ -55,28 +58,33 @@ public class GreedBehaviour : MonoBehaviour
     /// <summary>Whether Greed is currently waiting between patrol points.</summary>
     private bool isWaiting = false;
 
+    [Header("Components")]
     /// <summary>Reference to the NavMeshAgent controlling Greed's navigation.</summary>
     private NavMeshAgent agent;
     /// <summary>Reference to Greed's Animator for controlling animations.</summary>
     private Animator animator;
 
+    [Header("Jumpscare Settings")]
     /// <summary>The camera used for the jumpscare sequence.</summary>
     public GameObject camera1;
     /// <summary>Lighting object used during the jumpscare.</summary>
     public GameObject lighting;
-
-    /// <summary>The range in which Greed can knock over shelves.</summary>
-    public float shelfKnockRange = 2f;
     /// <summary>Whether the jumpscare sequence has been triggered.</summary>
     private bool isJumpscareTriggered = false;
-    /// <summary>Random number used for selecting patrol points.</summary>
-    int randNum;
 
+    [Header("Shelf Knockdown")]
+    /// <summary>The range in which Greed can knock over shelves.</summary>
+    public float shelfKnockRange = 2f;
+
+    [Header("Random Patrol")]
+    /// <summary>Random number used for selecting patrol points.</summary>
+    private int randNum;
+
+    [Header("Audio")]
     /// <summary>AudioSource for Greed's footsteps.</summary>
     public AudioSource footstepsAudio;
     /// <summary>AudioSource for Greed's jumpscare sound.</summary>
     public AudioSource jumpscareAudio;
-
     /// <summary>
     /// Initializes variables, sets a random patrol point, and ensures footsteps audio is looping.
     /// </summary>
